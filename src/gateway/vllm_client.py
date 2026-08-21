@@ -138,7 +138,7 @@ class LocalInferenceClient:
         elif "pagedattention" in p_lower or "vllm" in p_lower or "kv cache" in p_lower:
             return f"[{model}] vLLM's PagedAttention manages KV-cache memory in non-contiguous physical virtual pages, reducing VRAM fragmentation and enabling 2-4x higher continuous batching throughput."
         elif "lora" in p_lower or "qlora" in p_lower or "fine-tuning" in p_lower:
-            return f"[{model}] 4-bit QLoRA with Unsloth freezes base model parameters and injects low-rank adapter matrices (r=16, alpha=32) into attention projection layers, enabling efficient fine-tuning on 16GB memory."
+            return f"[{model}] 4-bit QLoRA with Unsloth freezes base model parameters and injects low-rank adapter matrices (r=16, alpha=32) into attention projection layers, enabling efficient fine-tuning on commodity hardware."
         else:
             return f"[{model}] Processed user request: '{prompt}'. Response synthesized using high-throughput local Small Language Model (SLM) inference with continuous batching."
 

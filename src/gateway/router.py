@@ -48,7 +48,7 @@ class ChatCompletionResponse(BaseModel):
 
 @router.get("/models", tags=["Models"])
 async def list_models():
-    """Returns list of supported local lightweight SLMs optimized for 16GB RAM."""
+    """Returns list of supported local lightweight SLMs production SLM tier."""
     now = int(time.time())
     return {
         "object": "list",

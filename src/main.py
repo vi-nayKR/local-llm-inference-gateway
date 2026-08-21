@@ -38,5 +38,5 @@ async def health_check():
         "service": settings.APP_NAME,
         "version": settings.VERSION,
         "default_model": settings.DEFAULT_MODEL,
-        "memory_optimized": "16GB RAM SLM Tier"
+        "memory_optimized": "High-Throughput SLM Tier"
     }

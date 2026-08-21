@@ -1,4 +1,4 @@
-# 📘 Phase 2: Local 16GB SLM Inference Client & SSE Token Streaming Proxy
+# 📘 Phase 2: Local SLM Inference Client & SSE Token Streaming Proxy
 
 ---
 
@@ -8,14 +8,14 @@ While **Phase 1** intercepts repetitive queries in $<5\text{ms}$ via semantic ca
 
 In traditional enterprise deployments, sending every cache miss to external commercial APIs (GPT-4o, Claude 3.5) introduces high recurring cloud costs, network egress latency, and compliance data-sharing concerns.
 
-**Phase 2 Goal:** Build an **OpenAI-compatible inference proxy** capable of executing modern **Small Language Models (SLMs)** locally on commodity 16GB RAM hardware, supporting:
+**Phase 2 Goal:** Build an **OpenAI-compatible inference proxy** capable of executing modern **Small Language Models (SLMs)** locally on commodity Commodity & Edge Hardware hardware, supporting:
 1. **vLLM PagedAttention Continuous Batching** for high-throughput generation ($>120\text{ tokens/second}$).
 2. **Real-Time Server-Sent Events (SSE)** token streaming (`stream: true`) with sub-50ms Time-To-First-Token (TTFT).
 3. **Automatic Write-Back** to the Redis 8 vector semantic cache upon completion synthesis.
 
 ---
 
-## 📐 2. Architectural Concepts: PagedAttention & 16GB SLM Tier
+## 📐 2. Architectural Concepts: PagedAttention & Local SLM Tier
 
 ### A. The Key-Value (KV) Cache Problem
 During autoregressive token generation, the model caches previous Keys and Values in GPU VRAM to avoid recomputing attention across earlier tokens.
@@ -43,7 +43,7 @@ $$\text{Logical Blocks} \longrightarrow \text{Block Table Mapping} \longrightarr
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### C. 16GB RAM Small Language Model (SLM) Tier
+### C. Small Language Model (SLM) Tier
 Modern 1B–3B parameter models achieve benchmark reasoning comparable to older 13B–70B models while consuming minimal RAM:
 
 | Model | Parameters | 4-bit VRAM Footprint | Throughput (Apple Silicon) | Primary Strength |
@@ -65,7 +65,7 @@ Modern 1B–3B parameter models achieve benchmark reasoning comparable to older 
   `data: {"choices": [{"delta": {"content": "..."}}]}` ending with `data: [DONE]`.
 
 ### Step 2: OpenAI-Compatible Router (`src/gateway/router.py`)
-- **`/v1/models`:** Enumerates available 16GB SLM models for client compatibility.
+- **`/v1/models`:** Enumerates available Local SLM models for client compatibility.
 - **`/v1/chat/completions`:**
   - Evaluates semantic cache first (unless `stream=True` or `bypass_cache=True`).
   - Dispatches to `inference_client` on cache miss.
@@ -102,4 +102,4 @@ OK
 > **Answer:** Running modern 1B–3B parameter SLMs locally via vLLM PagedAttention provides three major advantages:
 > 1. **Zero External API Cost:** Eliminates per-token billing, saving $>60\%$ on high-volume production pipelines.
 > 2. **Deterministic Latency & Privacy:** Retains all sensitive data on local infrastructure with no third-party data transmission, achieving $<50\text{ms}$ first-token latency.
-> 3. **High Concurrency via Continuous Batching:** PagedAttention partitions KV-cache into non-contiguous physical pages, preventing memory fragmentation and sustaining $>120\text{ tokens/second}$ on commodity 16GB unified memory hardware.
+> 3. **High Concurrency via Continuous Batching:** PagedAttention partitions KV-cache into non-contiguous physical pages, preventing memory fragmentation and sustaining $>120\text{ tokens/second}$ on commodity commodity hardware.

@@ -1,7 +1,7 @@
 <div align="center">
 
 # 🚀 High-Throughput Local LLM Inference Gateway
-### Redis 8 Vector Semantic Cache · vLLM PagedAttention · 4-Bit QLoRA Pipeline · 16GB RAM SLM Tier
+### Redis 8 Vector Semantic Cache · vLLM PagedAttention · 4-Bit QLoRA Pipeline · High-Throughput SLM Tier
 
 [![Python Version](https://img.shields.io/badge/Python-3.11%20%7C%203.12-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115%2B-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
@@ -10,9 +10,9 @@
 [![Unsloth](https://img.shields.io/badge/Fine--Tuning-Unsloth%204--bit%20QLoRA-FF6B00?style=flat-square)](https://github.com/unslothai/unsloth)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
 
-**An enterprise inference gateway engineered to serve modern Small Language Models (Llama 3.2 1B/3B, Qwen 2.5 1.5B) on 16GB RAM hardware, accelerated by sub-5ms Redis 8 vector semantic caching and protected by NeMo input/output guardrails.**
+**An enterprise inference gateway engineered to serve modern Small Language Models (Llama 3.2 1B/3B, Qwen 2.5 1.5B) on Commodity & Edge Hardware hardware, accelerated by sub-5ms Redis 8 vector semantic caching and protected by NeMo input/output guardrails.**
 
-[Architecture](#-system-architecture) • [Phased Implementation Guides](#-phased-implementation-guides) • [16GB SLM Tier](#-16gb-ram-slm-tier) • [Benchmarks](#-performance-benchmarks) • [Quickstart](#-quickstart--local-setup) • [Contributors](#-contributors)
+[Architecture](#-system-architecture) • [Phased Implementation Guides](#-phased-implementation-guides) • [SLM Tier](#-small-language-model-slm-tier) • [Benchmarks](#-performance-benchmarks) • [Quickstart](#-quickstart--local-setup) • [Contributors](#-contributors)
 
 ---
 
@@ -24,7 +24,7 @@ Modern enterprise Generative AI deployments often suffer from two major bottlene
 
 The **Local LLM Inference Gateway** resolves this by pairing **Redis 8 Vector Semantic Caching** with **local Small Language Model (SLM) serving** via **vLLM PagedAttention**:
 - **$<5\text{ms}$ Response Latency:** Repetitive or semantically similar queries ($\text{Cosine Similarity} \ge 0.90$) are intercepted and delivered in $<4\text{ms}$ directly from Redis 8, completely bypassing GPU execution.
-- **60% Cost Reduction:** Serves 40%+ of enterprise queries from cache and runs local 1B–3B models on lightweight commodity hardware (16GB RAM).
+- **60% Cost Reduction:** Serves 40%+ of enterprise queries from cache and runs local 1B–3B models on lightweight commodity hardware (Commodity & Edge Hardware).
 - **Zero VRAM Waste:** vLLM's PagedAttention dynamically manages Key-Value (KV) cache in non-contiguous memory blocks, unlocking continuous batching at $140+\text{tokens/second}$.
 
 ---
@@ -36,7 +36,7 @@ The gateway is engineered across 6 modular, production-tested phases with dedica
 | Phase | Core Capability | Documentation Guide |
 | :--- | :--- | :--- |
 | **Phase 1** | **Redis 8 Vector Semantic Cache** | [**`docs/phase1.md`**](docs/phase1.md) |
-| **Phase 2** | **16GB SLM Local Inference & SSE Streaming** | [**`docs/phase2.md`**](docs/phase2.md) |
+| **Phase 2** | **Local SLM Local Inference & SSE Streaming** | [**`docs/phase2.md`**](docs/phase2.md) |
 | **Phase 3** | **Input/Output Safety & PII Guardrails** | [**`docs/phase3.md`**](docs/phase3.md) |
 | **Phase 4** | **4-Bit QLoRA Fine-Tuning with Unsloth** | [**`docs/phase4.md`**](docs/phase4.md) |
 | **Phase 5** | **Concurrency Benchmarking & Latency Suite** | [**`docs/phase5.md`**](docs/phase5.md) |
@@ -60,7 +60,7 @@ flowchart TD
         CacheCheck -->|HIT: <5ms| CacheReturn["🚀 Return Cached Completion (Sub-5ms)"]
     end
 
-    subgraph InferenceTier ["Local SLM Execution Layer (16GB RAM)"]
+    subgraph InferenceTier ["Local SLM Execution Layer (Commodity & Edge Hardware)"]
         CacheCheck -->|MISS| vLLMProxy["🦙 vLLM / Ollama PagedAttention Engine"]
         vLLMProxy --> LocalModel["Llama 3.2 (1B/3B) / Qwen 2.5 (1.5B)\n4-bit Quantized (~1.2 - 2.2 GB VRAM)"]
         LocalModel --> StreamOutput["Real-Time SSE Token Stream"]
@@ -75,9 +75,9 @@ flowchart TD
 
 ---
 
-## ⚡ 16GB RAM Small Language Model (SLM) Tier
+## ⚡ Small Language Model (SLM) Tier
 
-Tailored specifically for local developer machines and edge servers with 16GB RAM:
+Tailored specifically for local developer machines and edge servers with Commodity & Edge Hardware:
 
 | Model ID | Parameters | 4-bit Memory | Speed (Tok/s) | Best Use Case |
 | :--- | :--- | :--- | :--- | :--- |

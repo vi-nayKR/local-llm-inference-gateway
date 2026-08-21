@@ -13,7 +13,7 @@ try:
         CACHE_TTL_SECONDS: int = 86400  # 24 hours
         VECTOR_DIMENSION: int = 384     # Lightweight 384-D embeddings
         
-        # Local SLM Settings (Optimized for 16GB RAM)
+        # Local SLM Settings (High-Throughput SLM Tier)
         VLLM_API_BASE: str = "http://localhost:8000/v1"
         OLLAMA_API_BASE: str = "http://localhost:11434/v1"
         DEFAULT_MODEL: str = "meta-llama/Llama-3.2-1B-Instruct"

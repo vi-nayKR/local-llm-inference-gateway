@@ -7,7 +7,7 @@ class QLoRATrainer:
     """
     4-Bit QLoRA Fine-Tuning Pipeline for Small Language Models (SLMs).
     Supports Unsloth and Hugging Face PEFT + BitsAndBytes 4-bit NF4 quantization.
-    Designed to fine-tune 1B-3B models on 16GB memory hardware in <2 hours.
+    Designed to fine-tune 1B-3B models on commodity hardware in <2 hours.
     """
     def __init__(
         self,

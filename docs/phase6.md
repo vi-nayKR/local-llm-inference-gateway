@@ -9,7 +9,7 @@ An enterprise inference gateway requires an **interactive observability and deve
 **Phase 6 Goal:** Build and deploy a **Production-Grade Interactive Web Console** (`ui/index.html`) mounted directly onto the FastAPI backend to provide:
 - **Interactive Chat Interface:** With live token-by-token streaming, Time-To-First-Token (TTFT) meters, and tokens/sec throughput counters.
 - **Semantic Cache Telemetry HUD:** Real-time visibility into cache hit rates, cumulative tokens saved, and estimated USD cost savings.
-- **Model Dynamic Switcher:** Hot-swapping between modern 16GB RAM Small Language Models (`Llama-3.2-1B`, `Qwen-2.5-1.5B`, `Llama-3.2-3B`).
+- **Model Dynamic Switcher:** Hot-swapping between modern Small Language Models (`Llama-3.2-1B`, `Qwen-2.5-1.5B`, `Llama-3.2-3B`).
 - **Guardrail Live Inspector:** Real-time toast alerts for intercepted prompt injection attempts and automated PII masking.
 
 ---
@@ -22,7 +22,7 @@ An enterprise inference gateway requires an **interactive observability and deve
 ├──────────────────────────────────────┬──────────────────────────────────────┤
 │  LEFT SIDEBAR (Controls & HUD)       │  RIGHT MAIN (Inference Console)      │
 ├──────────────────────────────────────┼──────────────────────────────────────┤
-│  1. SLM Model Selector (16GB Tier):  │  • Interactive Conversation Stream   │
+│  1. SLM Model Selector (SLM Tier):  │  • Interactive Conversation Stream   │
 │     [ Llama-3.2-1B-Instruct ▼ ]      │  • Live SSE Token Streaming Window   │
 │     • 4-bit AWQ / NF4 Quantization   │  • Latency & Badge Annotations:      │
 │     • vLLM PagedAttention Engine     │    [⚡ SEMANTIC CACHE HIT (0.50ms)]   │

@@ -11,7 +11,7 @@ Full parameter fine-tuning of an SLM requires storing model weights, gradients, 
 **Phase 4 Goal:** Implement a complete **4-bit Quantized Low-Rank Adaptation (QLoRA)** fine-tuning pipeline using **Unsloth & Hugging Face PEFT** to:
 - Freeze the base model in **4-bit NormalFloat (NF4)** precision (~1.2GB VRAM).
 - Inject trainable low-rank adapter matrices ($r=16, \alpha=32$) representing $<1.0\%$ of total parameters.
-- Fine-tune domain instruction datasets in **under 2 hours on 16GB memory hardware**.
+- Fine-tune domain instruction datasets in **under 2 hours on commodity hardware**.
 - Export trained adapters into **GGUF** (for Ollama / Apple Silicon Metal) and **AWQ** (for vLLM continuous batching).
 
 ---
@@ -56,10 +56,10 @@ QLoRA introduces three innovations to compress base weights:
 2. **Double Quantization (DQ):** Quantizes the quantization constants themselves, saving an extra $0.37\text{ bits per parameter}$.
 3. **Paged Optimizers:** Uses memory-mapped OS paging to prevent GPU out-of-memory spikes during long gradient checkpointing steps.
 
-### C. Parameter Efficiency on 16GB RAM:
+### C. Parameter Efficiency on Commodity & Edge Hardware:
 - **Base Model (Llama-3.2-1B):** $1,235,814,400$ total parameters (frozen in 4-bit $\approx 1.2\text{ GB}$).
 - **Trainable LoRA Adapters ($r=16$):** $11,534,336$ parameters (**only $0.93\%$ of the model!**).
-- **Peak Training Memory:** $\approx 1.4\text{ GB VRAM}$, easily training on 16GB unified memory laptops.
+- **Peak Training Memory:** $\approx 1.4\text{ GB VRAM}$, easily training on edge & commodity servers.
 
 ---
 
