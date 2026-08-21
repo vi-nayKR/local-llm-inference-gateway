@@ -1,8 +1,8 @@
-# 📘 Phase 5: Concurrency Benchmark Harness & Latency Percentiles
+# Phase 5: Concurrency Benchmark Harness & Latency Percentiles
 
 ---
 
-## 🎯 1. Overview & Objective
+## 1. Overview & Objective
 
 Building a high-performance inference architecture requires **empirical benchmarking under concurrent load** to prove system scalability, quantify latency percentiles, and calculate cost savings.
 
@@ -17,25 +17,25 @@ In production GenAI systems, two metrics define user experience and infrastructu
 
 ---
 
-## 📊 2. Benchmarking Methodology & Mathematical Metrics
+## 2. Benchmarking Methodology & Mathematical Metrics
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                       CONCURRENCY BENCHMARK HARNESS                         │
-├─────────────────────────────────────────────────────────────────────────────┤
-│   [ 50 Concurrent Async Workers ] ──► [ Input Safety Guardrails ]           │
-│                                                   │                         │
-│                    ┌──────────────────────────────┴──────────────────────┐  │
-│                    ▼                                                     ▼  │
-│      ⚡ 52% Semantic Cache Hits                            🦙 48% Local SLM  │
-│         (Latency: <1.0ms)                                  (Latency: ~45ms) │
-│                    │                                                     │  │
-│                    └──────────────────────┬──────────────────────────────┘  │
-│                                           ▼                                 │
-│                     [ Real-Time Telemetry Aggregator ]                      │
-│                  ✓ Throughput: >1,000 RPS | >28,000 Tok/s                   │
-│                  ✓ Cloud API Cost Reduction: ~62.5%                         │
-└─────────────────────────────────────────────────────────────────────────────┘
+
+ CONCURRENCY BENCHMARK HARNESS 
+
+ [ 50 Concurrent Async Workers ] [ Input Safety Guardrails ] 
+ 
+ 
+ 
+ 52% Semantic Cache Hits 48% Local SLM 
+ (Latency: <1.0ms) (Latency: ~45ms) 
+ 
+ 
+ 
+ [ Real-Time Telemetry Aggregator ] 
+ Throughput: >1,000 RPS | >28,000 Tok/s 
+ Cloud API Cost Reduction: ~62.5% 
+
 ```
 
 ### A. Latency Percentile Calculation ($p50, p95$)
@@ -50,14 +50,14 @@ $$\text{Cost Savings (\%)} = \text{Cache Hit Ratio} \times \left(1 - \frac{\text
 
 ---
 
-## 🛠️ 3. Step-by-Step Code Walkthrough
+## 3. Step-by-Step Code Walkthrough
 
 ### Step 1: Simulated Worker Engine (`tests/benchmark_throughput.py`)
 - **`simulate_user_request(user_id, prompt)`:**
-  1. Executes pre-flight regex guardrail sanitization.
-  2. Probes the Redis 8 vector semantic cache.
-  3. On cache miss, executes the local SLM client and writes the resulting completion back to the semantic cache.
-  4. Records exact millisecond latency, token count, and cache status.
+ 1. Executes pre-flight regex guardrail sanitization.
+ 2. Probes the Redis 8 vector semantic cache.
+ 3. On cache miss, executes the local SLM client and writes the resulting completion back to the semantic cache.
+ 4. Records exact millisecond latency, token count, and cache status.
 
 ### Step 2: Asynchronous Concurrency Coordinator (`run_benchmark`)
 - Spawns $50$ concurrent `asyncio` worker tasks.
@@ -66,7 +66,7 @@ $$\text{Cost Savings (\%)} = \text{Cache Hit Ratio} \times \left(1 - \frac{\text
 
 ---
 
-## 🧪 4. How to Run & Verify Phase 5
+## 4. How to Run & Verify Phase 5
 
 ### Command:
 ```bash
@@ -75,23 +75,23 @@ python3 tests/benchmark_throughput.py
 
 ### Expected Output:
 ```text
-⚡ Launching Throughput Benchmark with 50 concurrent workers...
+ Launching Throughput Benchmark with 50 concurrent workers...
 
 ======================================================================
-📊 LOCAL LLM INFERENCE GATEWAY — BENCHMARK RESULTS
+ LOCAL LLM INFERENCE GATEWAY — BENCHMARK RESULTS
 ======================================================================
-Total Requests Executed:    50
-Concurrent Workers:         50
-Cache Hit Ratio:            26 / 50 (52.0%)
-Total Tokens Generated:     1367 tokens
-Throughput (RPS):           1039.2 requests/second
-Throughput (Tokens/s):      28411.6 tokens/second
+Total Requests Executed: 50
+Concurrent Workers: 50
+Cache Hit Ratio: 26 / 50 (52.0%)
+Total Tokens Generated: 1367 tokens
+Throughput (RPS): 1039.2 requests/second
+Throughput (Tokens/s): 28411.6 tokens/second
 ----------------------------------------------------------------------
 LATENCY BREAKDOWN:
-  • Semantic Cache (p50):    0.50 ms
-  • Semantic Cache (p95):    0.50 ms
-  • Local SLM Serving (p50): 45.80 ms
-  • Local SLM Serving (p95): 46.21 ms
+ • Semantic Cache (p50): 0.50 ms
+ • Semantic Cache (p95): 0.50 ms
+ • Local SLM Serving (p50): 45.80 ms
+ • Local SLM Serving (p95): 46.21 ms
 ----------------------------------------------------------------------
 Estimated Cloud API Savings: 62.5% reduction in commercial API bills
 ======================================================================
@@ -99,7 +99,7 @@ Estimated Cloud API Savings: 62.5% reduction in commercial API bills
 
 ---
 
-## 💡 5. Technical Questions & Architectural Explanations
+## 5. Technical Questions & Architectural Explanations
 
 ### Q: How does the gateway maintain sub-millisecond p95 latency on cache hits under high concurrency?
 > **Answer:** Sub-millisecond latency is achieved through three architecture choices:

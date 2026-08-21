@@ -1,8 +1,8 @@
-# 📘 Phase 1: Redis 8 Vector Semantic Caching Engine
+# Phase 1: Redis 8 Vector Semantic Caching Engine
 
 ---
 
-## 🎯 1. Overview & Objective
+## 1. Overview & Objective
 
 In modern Generative AI systems, **repetitive and semantically equivalent queries** account for 30%–50% of enterprise inference traffic.
 - Example: *"What is RAG?"*, *"Explain retrieval augmented generation"*, and *"How does RAG work in AI?"* all share the same semantic intent.
@@ -12,7 +12,7 @@ In modern Generative AI systems, **repetitive and semantically equivalent querie
 
 ---
 
-## 📐 2. Mathematical Foundation & Vector Indexing
+## 2. Mathematical Foundation & Vector Indexing
 
 ### A. Vector Embedding & Dimensionality
 Text queries are transformed into dense vector representations:
@@ -31,24 +31,24 @@ $$\text{Cosine Similarity}(\hat{u}, \hat{v}) = \frac{\hat{u} \cdot \hat{v}}{\|\h
 This allows computing vector similarity in **$<0.5\text{ms}$ on standard CPU hardware** with zero floating-point division overhead during lookup!
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                          SEMANTIC CACHE DECISION FLOW                       │
-├─────────────────────────────────────────────────────────────────────────────┤
-│  User Query ──► [ 384-D Embedder ] ──► [ Vector Similarity Search ]         │
-│                                                   │                         │
-│                    ┌──────────────────────────────┴──────────────────────┐  │
-│                    ▼                                                     ▼  │
-│      [ Cosine Similarity >= 0.90 ]                         [ Cosine < 0.90 ]│
-│                    │                                                     │  │
-│                    ▼                                                     ▼  │
-│          ⚡ CACHE HIT (<5ms)                                    ❌ CACHE MISS│
-│     (Return Cached Completion)                             (Forward to SLM) │
-└─────────────────────────────────────────────────────────────────────────────┘
+
+ SEMANTIC CACHE DECISION FLOW 
+
+ User Query [ 384-D Embedder ] [ Vector Similarity Search ] 
+ 
+ 
+ 
+ [ Cosine Similarity >= 0.90 ] [ Cosine < 0.90 ]
+ 
+ 
+ CACHE HIT (<5ms) CACHE MISS
+ (Return Cached Completion) (Forward to SLM) 
+
 ```
 
 ---
 
-## 🛠️ 3. Step-by-Step Code Walkthrough
+## 3. Step-by-Step Code Walkthrough
 
 ### Step 1: Configuration (`config/gateway_config.py`)
 Defines the vector dimensions, similarity threshold, and Redis connection parameters:
@@ -68,7 +68,7 @@ Defines the vector dimensions, similarity threshold, and Redis connection parame
 
 ---
 
-## 🧪 4. How to Run & Verify Phase 1
+## 4. How to Run & Verify Phase 1
 
 ### Command:
 ```bash
@@ -93,7 +93,7 @@ OK
 
 ---
 
-## 💡 5. Technical Questions & Architectural Explanations
+## 5. Technical Questions & Architectural Explanations
 
 ### Q: How is semantic caching implemented in the LLM gateway to reduce latency and cost?
 > **Answer:** To eliminate redundant GPU cycles, the gateway implements a 2-tier vector semantic cache in Python and Redis 8. When a query enters the gateway, it is encoded into a 384-dimensional unit-normalized vector using n-gram feature hashing. We then evaluate cosine similarity against previously cached prompt vectors. If the similarity meets or exceeds the threshold, the pre-computed response is served in under 5 milliseconds. In concurrency benchmarks across 50 workers, this yields a ~52% cache hit rate and reduces cloud API spend by over 60% without heavy external dependencies.

@@ -1,8 +1,8 @@
-# 📘 Phase 4: 4-Bit QLoRA Fine-Tuning Pipeline with Unsloth & PEFT
+# Phase 4: 4-Bit QLoRA Fine-Tuning Pipeline with Unsloth & PEFT
 
 ---
 
-## 🎯 1. Overview & Objective
+## 1. Overview & Objective
 
 Base foundational Small Language Models (SLMs) like `Llama-3.2-1B` or `Qwen-2.5-1.5B` have strong general conversational ability, but they often struggle with **domain-specific compliance rules, proprietary JSON schemas, and nuanced risk classification policies**.
 
@@ -16,7 +16,7 @@ Full parameter fine-tuning of an SLM requires storing model weights, gradients, 
 
 ---
 
-## 📐 2. Mathematical Foundation: LoRA & QLoRA
+## 2. Mathematical Foundation: LoRA & QLoRA
 
 ### A. Low-Rank Matrix Decomposition (LoRA)
 During standard fine-tuning, weight matrix updates are represented as $\Delta W \in \mathbb{R}^{d \times k}$. 
@@ -31,23 +31,23 @@ Where:
 - $\alpha$ is a constant scaling hyperparameter (typically $\alpha = 2r = 32$).
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                            LoRA FORWARD PASS                                │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                         Input Activation: x                                 │
-│                                │                                            │
-│               ┌────────────────┴────────────────┐                           │
-│               ▼                                 ▼                           │
-│     [ Frozen Base Weight: W0 ]        [ Down-Projection: A (d -> r) ]       │
-│               │                                 │                           │
-│               │                       [ Up-Projection: B (r -> k) ]         │
-│               │                                 │                           │
-│               │                       [ Scaling Factor: alpha / r ]         │
-│               │                                 │                           │
-│               └────────────────┬────────────────┘                           │
-│                                ▼                                            │
-│                     Output: h = x*W0 + x*(B*A)                              │
-└─────────────────────────────────────────────────────────────────────────────┘
+
+ LoRA FORWARD PASS 
+
+ Input Activation: x 
+ 
+ 
+ 
+ [ Frozen Base Weight: W0 ] [ Down-Projection: A (d -> r) ] 
+ 
+ [ Up-Projection: B (r -> k) ] 
+ 
+ [ Scaling Factor: alpha / r ] 
+ 
+ 
+ 
+ Output: h = x*W0 + x*(B*A) 
+
 ```
 
 ### B. 4-Bit NormalFloat (NF4) & Double Quantization
@@ -63,7 +63,7 @@ QLoRA introduces three innovations to compress base weights:
 
 ---
 
-## 🛠️ 3. Step-by-Step Code Walkthrough
+## 3. Step-by-Step Code Walkthrough
 
 ### Step 1: Instruction Dataset Formatter (`src/fine_tuning/dataset.py`)
 - Formats domain instruction-input-output triplets into the standard **Llama 3.2 Chat template** (`<|begin_of_text|>`, `<|start_header_id|>`, `<|end_header_id|>`, `<|eot_id|>`).
@@ -80,7 +80,7 @@ QLoRA introduces three innovations to compress base weights:
 
 ---
 
-## 🧪 4. How to Run & Verify Phase 4
+## 4. How to Run & Verify Phase 4
 
 ### Command:
 ```bash
@@ -104,7 +104,7 @@ OK
 
 ---
 
-## 💡 5. Technical Questions & Architectural Explanations
+## 5. Technical Questions & Architectural Explanations
 
 ### Q: Why apply LoRA to all linear layers instead of just query and value projections (q_proj, v_proj)?
 > **Answer:** Early LoRA papers only adapted attention query and value matrices (`q_proj`, `v_proj`). Recent empirical benchmarks demonstrate that adapting **all linear layers** (including attention output `o_proj`, key `k_proj`, and MLP gates `gate_proj`, `up_proj`, `down_proj`) with a smaller rank (e.g. $r=16$) yields significantly higher downstream reasoning accuracy and domain recall than using a high rank ($r=64$) on attention layers alone, with negligible extra VRAM overhead.

@@ -1,8 +1,8 @@
-# 📘 Phase 2: Local SLM Inference Client & SSE Token Streaming Proxy
+# Phase 2: Local SLM Inference Client & SSE Token Streaming Proxy
 
 ---
 
-## 🎯 1. Overview & Objective
+## 1. Overview & Objective
 
 While **Phase 1** intercepts repetitive queries in $<5\text{ms}$ via semantic caching, **cache misses** still require invoking a Language Model for generation.
 
@@ -15,7 +15,7 @@ In traditional enterprise deployments, sending every cache miss to external comm
 
 ---
 
-## 📐 2. Architectural Concepts: PagedAttention & Local SLM Tier
+## 2. Architectural Concepts: PagedAttention & Local SLM Tier
 
 ### A. The Key-Value (KV) Cache Problem
 During autoregressive token generation, the model caches previous Keys and Values in GPU VRAM to avoid recomputing attention across earlier tokens.
@@ -33,14 +33,14 @@ $$\text{Logical Blocks} \longrightarrow \text{Block Table Mapping} \longrightarr
 - Enables **continuous batching** without head-of-line blocking, doubling serving throughput.
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                       PAGEDATTENTION KV-CACHE MAPPING                       │
-├─────────────────────────────────────────────────────────────────────────────┤
-│  Logical Sequence: [Token 0 ... 15] ──► Block Table ──► Physical Page #42  │
-│  Logical Sequence: [Token 16 ... 31] ──► Block Table ──► Physical Page #107 │
-│                                                                             │
-│  ✓ 0% Memory Fragmentation  ✓ Dynamic Block Sharing  ✓ Continuous Batching  │
-└─────────────────────────────────────────────────────────────────────────────┘
+
+ PAGEDATTENTION KV-CACHE MAPPING 
+
+ Logical Sequence: [Token 0 ... 15] Block Table Physical Page #42 
+ Logical Sequence: [Token 16 ... 31] Block Table Physical Page #107 
+ 
+ 0% Memory Fragmentation Dynamic Block Sharing Continuous Batching 
+
 ```
 
 ### C. Small Language Model (SLM) Tier
@@ -55,26 +55,26 @@ Modern 1B–3B parameter models achieve benchmark reasoning comparable to older 
 
 ---
 
-## 🛠️ 3. Step-by-Step Code Walkthrough
+## 3. Step-by-Step Code Walkthrough
 
 ### Step 1: Local Inference Client (`src/gateway/vllm_client.py`)
 - **`generate_completion(messages, model, ...)`:**
-  Executes non-streaming completions. Tracks execution time, computed token counts, and generation speed (tokens/sec).
+ Executes non-streaming completions. Tracks execution time, computed token counts, and generation speed (tokens/sec).
 - **`stream_completion(messages, model, ...)`:**
-  Asynchronous generator emitting chunks conforming to the OpenAI SSE protocol:
-  `data: {"choices": [{"delta": {"content": "..."}}]}` ending with `data: [DONE]`.
+ Asynchronous generator emitting chunks conforming to the OpenAI SSE protocol:
+ `data: {"choices": [{"delta": {"content": "..."}}]}` ending with `data: [DONE]`.
 
 ### Step 2: OpenAI-Compatible Router (`src/gateway/router.py`)
 - **`/v1/models`:** Enumerates available Local SLM models for client compatibility.
 - **`/v1/chat/completions`:**
-  - Evaluates semantic cache first (unless `stream=True` or `bypass_cache=True`).
-  - Dispatches to `inference_client` on cache miss.
-  - Automatically writes new completions back to the semantic cache for subsequent queries.
+ - Evaluates semantic cache first (unless `stream=True` or `bypass_cache=True`).
+ - Dispatches to `inference_client` on cache miss.
+ - Automatically writes new completions back to the semantic cache for subsequent queries.
 - **`/v1/cache/stats` & `/v1/cache/clear`:** Real-time cache management endpoints.
 
 ---
 
-## 🧪 4. How to Run & Verify Phase 2
+## 4. How to Run & Verify Phase 2
 
 ### Command:
 ```bash
@@ -96,7 +96,7 @@ OK
 
 ---
 
-## 💡 5. Technical Questions & Architectural Explanations
+## 5. Technical Questions & Architectural Explanations
 
 ### Q: Why run Small Language Models (SLMs) locally with vLLM instead of calling commercial cloud APIs?
 > **Answer:** Running modern 1B–3B parameter SLMs locally via vLLM PagedAttention provides three major advantages:

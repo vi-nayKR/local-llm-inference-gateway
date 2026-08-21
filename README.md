@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🚀 High-Throughput Local LLM Inference Gateway
+# High-Throughput Local LLM Inference Gateway
 ### Redis 8 Vector Semantic Cache · vLLM PagedAttention · 4-Bit QLoRA Pipeline · High-Throughput SLM Tier
 
 [![Python Version](https://img.shields.io/badge/Python-3.11%20%7C%203.12-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
@@ -18,7 +18,7 @@
 
 </div>
 
-## 📌 Executive Summary
+## Executive Summary
 
 Modern enterprise Generative AI deployments often suffer from two major bottlenecks: **expensive commercial LLM API bills** and **high GPU latency under repetitive queries**.
 
@@ -29,7 +29,7 @@ The **Local LLM Inference Gateway** resolves this by pairing **Redis 8 Vector Se
 
 ---
 
-## 📚 Phased Implementation Guides
+## Phased Implementation Guides
 
 The gateway is engineered across 6 modular, production-tested phases with dedicated architectural documentation:
 
@@ -44,38 +44,38 @@ The gateway is engineered across 6 modular, production-tested phases with dedica
 
 ---
 
-## 🏛️ System Architecture
+## System Architecture
 
 ```mermaid
 flowchart TD
-    Client["📱 Client Request (OpenAI Format)"] --> GatewayRouter["FastAPI Gateway (/v1/chat/completions)"]
+ Client[" Client Request (OpenAI Format)"] --> GatewayRouter["FastAPI Gateway (/v1/chat/completions)"]
 
-    subgraph SecurityTier ["Shield Layer"]
-        GatewayRouter --> SafetyGuard["🛡️ NeMo Safety Guardrails\n(Injection Shield & PII Masking)"]
-    end
+ subgraph SecurityTier ["Shield Layer"]
+ GatewayRouter --> SafetyGuard[" NeMo Safety Guardrails\n(Injection Shield & PII Masking)"]
+ end
 
-    subgraph CacheTier ["Semantic Acceleration Layer"]
-        SafetyGuard --> Embedder["⚡ 384-D Vector Embedder (<0.5ms)"]
-        Embedder --> CacheCheck{"Redis 8 Vector Search\nCosine Sim >= 0.90?"}
-        CacheCheck -->|HIT: <5ms| CacheReturn["🚀 Return Cached Completion (Sub-5ms)"]
-    end
+ subgraph CacheTier ["Semantic Acceleration Layer"]
+ SafetyGuard --> Embedder[" 384-D Vector Embedder (<0.5ms)"]
+ Embedder --> CacheCheck{"Redis 8 Vector Search\nCosine Sim >= 0.90?"}
+ CacheCheck -->|HIT: <5ms| CacheReturn[" Return Cached Completion (Sub-5ms)"]
+ end
 
-    subgraph InferenceTier ["Local SLM Execution Layer (Commodity & Edge Hardware)"]
-        CacheCheck -->|MISS| vLLMProxy["🦙 vLLM / Ollama PagedAttention Engine"]
-        vLLMProxy --> LocalModel["Llama 3.2 (1B/3B) / Qwen 2.5 (1.5B)\n4-bit Quantized (~1.2 - 2.2 GB VRAM)"]
-        LocalModel --> StreamOutput["Real-Time SSE Token Stream"]
-        LocalModel --> WriteBack["Async Write-Back to Redis Vector Cache"]
-    end
+ subgraph InferenceTier ["Local SLM Execution Layer (Commodity & Edge Hardware)"]
+ CacheCheck -->|MISS| vLLMProxy[" vLLM / Ollama PagedAttention Engine"]
+ vLLMProxy --> LocalModel["Llama 3.2 (1B/3B) / Qwen 2.5 (1.5B)\n4-bit Quantized (~1.2 - 2.2 GB VRAM)"]
+ LocalModel --> StreamOutput["Real-Time SSE Token Stream"]
+ LocalModel --> WriteBack["Async Write-Back to Redis Vector Cache"]
+ end
 
-    subgraph FineTuningTier ["Domain Adaptation Pipeline"]
-        DomainData["📚 Compliance Instruction Data"] --> QLoRATrainer["🔬 4-bit QLoRA with Unsloth\n(r=16, alpha=32, target: all-linear)"]
-        QLoRATrainer --> GGUFExport["Export GGUF / 4-bit AWQ to vLLM"]
-    end
+ subgraph FineTuningTier ["Domain Adaptation Pipeline"]
+ DomainData[" Compliance Instruction Data"] --> QLoRATrainer[" 4-bit QLoRA with Unsloth\n(r=16, alpha=32, target: all-linear)"]
+ QLoRATrainer --> GGUFExport["Export GGUF / 4-bit AWQ to vLLM"]
+ end
 ```
 
 ---
 
-## ⚡ Small Language Model (SLM) Tier
+## Small Language Model (SLM) Tier
 
 Tailored specifically for local developer machines and edge servers with Commodity & Edge Hardware:
 
@@ -88,7 +88,7 @@ Tailored specifically for local developer machines and edge servers with Commodi
 
 ---
 
-## 📊 Performance Benchmarks
+## Performance Benchmarks
 
 Results from our 50-worker concurrency benchmark harness (`tests/benchmark_throughput.py`):
 
@@ -102,7 +102,7 @@ Results from our 50-worker concurrency benchmark harness (`tests/benchmark_throu
 
 ---
 
-## 🚀 Quickstart & Local Setup
+## Quickstart & Local Setup
 
 ### 1. Clone & Setup
 ```bash
@@ -120,7 +120,7 @@ Open [**http://localhost:8000**](http://localhost:8000) in your browser to launc
 
 ---
 
-## 🧪 Running Automated Tests
+## Running Automated Tests
 
 ```bash
 python3 -m unittest discover tests/
@@ -129,12 +129,12 @@ python3 -m unittest discover tests/
 
 ---
 
-## 👥 Contributors
+## Contributors
 
 - **Vinay K R** ([@vi-nayKR](https://github.com/vi-nayKR)) — Lead Architect & Systems Engineer
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
