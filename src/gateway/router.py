@@ -8,6 +8,7 @@ from typing import List, Optional, Dict, Any
 from config.gateway_config import settings
 from src.gateway.cache import semantic_cache
 from src.gateway.vllm_client import inference_client
+from src.guardrails.safety import safety_guardrails
 
 router = APIRouter()
 
@@ -69,6 +70,7 @@ async def list_models():
 async def chat_completions(req: ChatCompletionRequest):
     """
     OpenAI-compatible chat completion endpoint.
+    0. Evaluates input against Safety Guardrails (Prompt Injection & PII Masking).
     1. Evaluates Redis 8 vector semantic cache for sub-5ms return (unless bypass_cache=True).
     2. Fallbacks to local vLLM / SLM inference client with continuous batching.
     3. Supports both standard JSON and real-time Server-Sent Events (SSE) streaming.
@@ -76,6 +78,13 @@ async def chat_completions(req: ChatCompletionRequest):
     user_prompt = next((m.content for m in reversed(req.messages) if m.role == "user"), "")
     if not user_prompt:
         raise HTTPException(status_code=400, detail="No user message found in messages array.")
+
+    # 0. Safety Guardrails Validation
+    if settings.ENABLE_SAFETY_GUARDRAILS:
+        is_safe, sanitized_prompt, reason = safety_guardrails.validate_input(user_prompt)
+        if not is_safe:
+            raise HTTPException(status_code=400, detail={"error": "SAFETY_GUARDRAIL_VIOLATION", "reason": reason})
+        user_prompt = sanitized_prompt
 
     # 1. Check Redis Semantic Cache (if not streaming and not bypassing cache)
     if not req.stream and not req.bypass_cache:
