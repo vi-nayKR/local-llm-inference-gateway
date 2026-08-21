@@ -1,20 +1,57 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
+import os
+from typing import List
 
-class GatewaySettings(BaseSettings):
-    APP_NAME: str = "Local LLM Inference Gateway"
-    VERSION: str = "1.0.0"
-    
-    # Redis Semantic Cache
-    REDIS_URL: str = "redis://localhost:6379/0"
-    CACHE_SIMILARITY_THRESHOLD: float = 0.95
-    CACHE_TTL_SECONDS: int = 86400  # 24 hours
-    
-    # vLLM Server Settings
-    VLLM_API_BASE: str = "http://localhost:8000/v1"
-    DEFAULT_MODEL: str = "meta-llama/Meta-Llama-3.1-8B-Instruct"
-    MAX_TOKENS: int = 2048
-    TEMPERATURE: float = 0.7
-    
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+try:
+    from pydantic_settings import BaseSettings, SettingsConfigDict
+    class GatewaySettings(BaseSettings):
+        APP_NAME: str = "High-Throughput Local LLM Inference Gateway"
+        VERSION: str = "1.0.0"
+        
+        # Redis 8 Vector Semantic Cache
+        REDIS_URL: str = "redis://localhost:6379/0"
+        CACHE_SIMILARITY_THRESHOLD: float = 0.60
+        CACHE_TTL_SECONDS: int = 86400  # 24 hours
+        VECTOR_DIMENSION: int = 384     # Lightweight 384-D embeddings
+        
+        # Local SLM Settings (Optimized for 16GB RAM)
+        VLLM_API_BASE: str = "http://localhost:8000/v1"
+        OLLAMA_API_BASE: str = "http://localhost:11434/v1"
+        DEFAULT_MODEL: str = "meta-llama/Llama-3.2-1B-Instruct"  # ~1.2GB VRAM
+        SUPPORTED_MODELS: List[str] = [
+            "meta-llama/Llama-3.2-1B-Instruct",  # 1.2 GB RAM (Fastest)
+            "Qwen/Qwen2.5-1.5B-Instruct",        # 1.5 GB RAM (High reasoning)
+            "meta-llama/Llama-3.2-3B-Instruct",  # 2.2 GB RAM (Balanced)
+            "HuggingFaceTB/SmolLM2-1.7B-Instruct",# 1.7 GB RAM
+            "microsoft/Phi-3.5-mini-instruct"    # 2.8 GB RAM
+        ]
+        MAX_TOKENS: int = 1024
+        TEMPERATURE: float = 0.7
+        ENABLE_SAFETY_GUARDRAILS: bool = True
+        MAX_INPUT_CHARS: int = 4000
+        
+        model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    settings = GatewaySettings()
+except ImportError:
+    class StandaloneSettings:
+        APP_NAME: str = os.getenv("APP_NAME", "High-Throughput Local LLM Inference Gateway")
+        VERSION: str = "1.0.0"
+        REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+        CACHE_SIMILARITY_THRESHOLD: float = float(os.getenv("CACHE_SIMILARITY_THRESHOLD", "0.60"))
+        CACHE_TTL_SECONDS: int = int(os.getenv("CACHE_TTL_SECONDS", "86400"))
+        VECTOR_DIMENSION: int = int(os.getenv("VECTOR_DIMENSION", "384"))
+        VLLM_API_BASE: str = os.getenv("VLLM_API_BASE", "http://localhost:8000/v1")
+        OLLAMA_API_BASE: str = os.getenv("OLLAMA_API_BASE", "http://localhost:11434/v1")
+        DEFAULT_MODEL: str = os.getenv("DEFAULT_MODEL", "meta-llama/Llama-3.2-1B-Instruct")
+        SUPPORTED_MODELS: List[str] = [
+            "meta-llama/Llama-3.2-1B-Instruct",
+            "Qwen/Qwen2.5-1.5B-Instruct",
+            "meta-llama/Llama-3.2-3B-Instruct",
+            "HuggingFaceTB/SmolLM2-1.7B-Instruct",
+            "microsoft/Phi-3.5-mini-instruct"
+        ]
+        MAX_TOKENS: int = int(os.getenv("MAX_TOKENS", "1024"))
+        TEMPERATURE: float = float(os.getenv("TEMPERATURE", "0.7"))
+        ENABLE_SAFETY_GUARDRAILS: bool = True
+        MAX_INPUT_CHARS: int = 4000
 
-settings = GatewaySettings()
+    settings = StandaloneSettings()
