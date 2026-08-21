@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Optional
 
 try:
     from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -16,18 +16,25 @@ try:
         # Local SLM Settings (Optimized for 16GB RAM)
         VLLM_API_BASE: str = "http://localhost:8000/v1"
         OLLAMA_API_BASE: str = "http://localhost:11434/v1"
-        DEFAULT_MODEL: str = "meta-llama/Llama-3.2-1B-Instruct"  # ~1.2GB VRAM
+        DEFAULT_MODEL: str = "meta-llama/Llama-3.2-1B-Instruct"
         SUPPORTED_MODELS: List[str] = [
-            "meta-llama/Llama-3.2-1B-Instruct",  # 1.2 GB RAM (Fastest)
-            "Qwen/Qwen2.5-1.5B-Instruct",        # 1.5 GB RAM (High reasoning)
-            "meta-llama/Llama-3.2-3B-Instruct",  # 2.2 GB RAM (Balanced)
-            "HuggingFaceTB/SmolLM2-1.7B-Instruct",# 1.7 GB RAM
-            "microsoft/Phi-3.5-mini-instruct"    # 2.8 GB RAM
+            "meta-llama/Llama-3.2-1B-Instruct",
+            "Qwen/Qwen2.5-1.5B-Instruct",
+            "meta-llama/Llama-3.2-3B-Instruct",
+            "HuggingFaceTB/SmolLM2-1.7B-Instruct",
+            "microsoft/Phi-3.5-mini-instruct",
+            "gpt-4o-mini",
+            "groq/llama-3.2-1b-preview"
         ]
         MAX_TOKENS: int = 1024
         TEMPERATURE: float = 0.7
         ENABLE_SAFETY_GUARDRAILS: bool = True
         MAX_INPUT_CHARS: int = 4000
+        
+        # Optional External Fallback API Keys (Works 100% offline without them)
+        OPENAI_API_KEY: Optional[str] = None
+        GROQ_API_KEY: Optional[str] = None
+        OPENROUTER_API_KEY: Optional[str] = None
         
         model_config = SettingsConfigDict(env_file=".env", extra="ignore")
     settings = GatewaySettings()
@@ -47,11 +54,16 @@ except ImportError:
             "Qwen/Qwen2.5-1.5B-Instruct",
             "meta-llama/Llama-3.2-3B-Instruct",
             "HuggingFaceTB/SmolLM2-1.7B-Instruct",
-            "microsoft/Phi-3.5-mini-instruct"
+            "microsoft/Phi-3.5-mini-instruct",
+            "gpt-4o-mini",
+            "groq/llama-3.2-1b-preview"
         ]
         MAX_TOKENS: int = int(os.getenv("MAX_TOKENS", "1024"))
         TEMPERATURE: float = float(os.getenv("TEMPERATURE", "0.7"))
         ENABLE_SAFETY_GUARDRAILS: bool = True
         MAX_INPUT_CHARS: int = 4000
+        OPENAI_API_KEY: Optional[str] = os.getenv("OPENAI_API_KEY")
+        GROQ_API_KEY: Optional[str] = os.getenv("GROQ_API_KEY")
+        OPENROUTER_API_KEY: Optional[str] = os.getenv("OPENROUTER_API_KEY")
 
     settings = StandaloneSettings()
